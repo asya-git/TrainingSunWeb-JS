@@ -1,4 +1,4 @@
-const staffs = [
+let staffs = [
     {
         id: 1,
         name: "John",
@@ -89,9 +89,11 @@ let modal = document.getElementById("modal");
 
 //Подгружаем таблицу
 function updateTable(staffs) {
+    if (!tbody.innerHTML == '') {
+        tbody.innerHTML = '';
+    }
     staffs.forEach((staff) => {
         let tr = document.createElement("tr");
-
         thList.forEach((th) => {
             let td = document.createElement("td");
             switch (th.textContent) {
@@ -125,7 +127,13 @@ function updateTable(staffs) {
                     tr.appendChild(td);
                     break;
             }
+            
         });
+        let button = document.createElement("button");
+        button.innerHTML = "Удалить";
+        button.className = "button";
+        tr.appendChild(button);
+
         tbody.appendChild(tr);
     });
 }
@@ -140,7 +148,7 @@ btAppend.addEventListener("click", () => {
 
 let idLastStaff = 8;
 
-document.addEventListener("click", function(e) 
+document.querySelector(".modal-dialog > .modal-content").addEventListener("click", function(e) 
 {
     //скрытие формы
     if (e.target.classList.contains("close-modal")) {
@@ -151,18 +159,94 @@ document.addEventListener("click", function(e)
     if (e.target.classList.contains("save-modal")) {
         const formData = new FormData(document.forms[0]);
         const data = Object.fromEntries(formData.entries());
-
-        //сделать нормальный id
     
         data.id = ++idLastStaff;
         data.skills = data.skills.split(/,\s|,|\s/);
 
-        updateTable([data]);
+        staffs.push(data);
+
+        updateTable(staffs);
     }
+});
+
+document.querySelector("tbody").addEventListener("click", function(e) 
+{
+    let tr = e.target.parentElement;
+    let id = tr.childNodes[0];
+    staffs.forEach((staff) => {
+        if (staff.id == id) {
+            /* delete staff.id; */
+            console.log(staff);
+        }
+        /* console.log(id); */
+        console.log(staff);
+    });
     
+    /* console.log(staffs); */
+    updateTable(staffs);
     
 });
 
+document.querySelector("table").addEventListener("click", function(e) 
+{
+    /* Сортировка */
+    tdSort = e.target.dataset.sort;
+    if (tdSort) {
 
+        const sort = ['id', 'name', 'age', 'gender', 'salary', 'employment_at'];
+        
+        if (tdSort == 'name') {
+            staffs.sort((a, b) => a.name > b.name ? 1 : -1);
+        }
+        switch (tdSort) {
+            case 'id':
+                staffs.sort((a, b) => a.id > b.id ? 1 : -1);
+                break;
+            case 'name':
+                staffs.sort((a, b) => a.name > b.name ? 1 : -1);
+                break;
+            case 'age':
+                staffs.sort((a, b) => a.age > b.age ? 1 : -1);
+                break;
+            case 'gender':
+                staffs.sort((a, b) => a.gender > b.gender ? 1 : -1);
+                break;
+            case 'salary':
+                staffs.sort((a, b) => a.salary > b.salary ? 1 : -1);
+                break;
+            case 'employment_at':
+                staffs.sort((a, b) => a.employment_at > b.employment_at ? 1 : -1);
+                break;
+            default:
+                console.log("Что-то пошло не так");
+                break;
+        }
+
+        updateTable(staffs);
+    }
+
+    /* Удаление */
+
+    
+});
+
+/* Фильтр */
+document.getElementById("filter").addEventListener("keydown", function(e) {
+    if (e.key == 'Enter') {
+        
+        let word = document.getElementById("filter").value;
+        let fillterList = [];
+        staffs.filter((staff) => {
+            /* Фильтр по имени  */
+            let name = staff.name.toLowerCase();
+            if (name.indexOf(word) != -1) {
+                fillterList.push(staff);
+            }
+        });
+        updateTable(fillterList);
+        console.log(word);
+    }
+
+});
 
 

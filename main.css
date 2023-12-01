@@ -1,3 +1,13 @@
 .show {
     display: block;
 }
+
+.button {
+    height: auto;
+    color: black;
+}
+
+.button:hover {
+    background-color: brown;
+    color: white;
+}
