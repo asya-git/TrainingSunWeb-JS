@@ -2,12 +2,14 @@
     display: block;
 }
 
-.button {
+.delButton {
     height: auto;
     color: black;
+    border: 0;
 }
 
-.button:hover {
+.delButton:hover {
     background-color: brown;
     color: white;
+    border-radius: 5px;
 }

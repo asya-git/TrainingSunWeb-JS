@@ -81,20 +81,22 @@ let staffs = [
     }
 ]
 
-let tbody = document.getElementById("table-body");
-const thList = document.querySelector("thead > tr").childNodes;
-const btAppend = document.querySelector(".col-1 > button");
-let modal = document.getElementById("modal");
+const tbody = document.getElementById("table-body");
+const tableHeaders = document.querySelector("thead > tr").childNodes;
+const btnAppend = document.querySelector(".col-1 > button");
+const modal = document.getElementById("modal");
 
-
-//Подгружаем таблицу
-function updateTable(staffs) {
+/**Вывод сотрудников
+ * @param {Array} listStaffs - список объектов-сотрудников
+ * */ 
+function showStaffs(staffs) 
+{
     if (!tbody.innerHTML == '') {
         tbody.innerHTML = '';
     }
     staffs.forEach((staff) => {
         let tr = document.createElement("tr");
-        thList.forEach((th) => {
+        tableHeaders.forEach((th) => {
             let td = document.createElement("td");
             switch (th.textContent) {
                 case "#":
@@ -129,76 +131,53 @@ function updateTable(staffs) {
             }
             
         });
+
+        // Добавление кнопки удаления----------------------------------------------- 
         let button = document.createElement("button");
         button.innerHTML = "Удалить";
-        button.className = "button";
+        button.className = "delButton";
         tr.appendChild(button);
 
         tbody.appendChild(tr);
     });
 }
 
-updateTable(staffs);
-
-
-//Накладываем событие на кнопку
-btAppend.addEventListener("click", () => {
-    modal.classList.add('show');
-});
-
-let idLastStaff = 8;
-
-document.querySelector(".modal-dialog > .modal-content").addEventListener("click", function(e) 
+/**Сохранить сотрудника
+ * @param {object} staff - Сотрудник, которого нужно добавить
+ * @param {Array} staffs - Список сотрудников, куда нужно добавить
+ */
+function saveStaff(staff, staffs) 
 {
-    //скрытие формы
-    if (e.target.classList.contains("close-modal")) {
-        modal.classList.remove('show');
-    }
+    staff.id = staffs.length;
+    staff.skills = staff.skills.split(/,\s|,|\s/);
 
-    //Получение данных с формы
-    if (e.target.classList.contains("save-modal")) {
-        const formData = new FormData(document.forms[0]);
-        const data = Object.fromEntries(formData.entries());
-    
-        data.id = ++idLastStaff;
-        data.skills = data.skills.split(/,\s|,|\s/);
+    staffs.push(staff);
+}
 
-        staffs.push(data);
-
-        updateTable(staffs);
-    }
-});
-
-document.querySelector("tbody").addEventListener("click", function(e) 
+/**
+ * Удаление сотрудника
+ * @param {number} id - id сотрудника
+ * @param {Array} staffs - список сотрудников
+ */
+function deleteStaff (id, staffs) 
 {
-    let tr = e.target.parentElement;
-    let id = tr.childNodes[0];
     staffs.forEach((staff) => {
-        if (staff.id == id) {
-            /* delete staff.id; */
-            console.log(staff);
+        if (staff.id === id) {
+            let index = staffs.indexOf(staff);
+            staffs.splice(index, 1);
         }
-        /* console.log(id); */
-        console.log(staff);
     });
-    
-    /* console.log(staffs); */
-    updateTable(staffs);
-    
-});
+}
 
-document.querySelector("table").addEventListener("click", function(e) 
+/**
+ * Сортировать по полю
+ * @param {string} field - поле
+ * @param {Array} staffs - список сотрудников
+ */
+function sortByField(field, staffs)
 {
-    /* Сортировка */
-    tdSort = e.target.dataset.sort;
-    if (tdSort) {
-
-        const sort = ['id', 'name', 'age', 'gender', 'salary', 'employment_at'];
-        
-        if (tdSort == 'name') {
-            staffs.sort((a, b) => a.name > b.name ? 1 : -1);
-        }
-        switch (tdSort) {
+    if (field) {
+        switch (field) {
             case 'id':
                 staffs.sort((a, b) => a.id > b.id ? 1 : -1);
                 break;
@@ -221,32 +200,88 @@ document.querySelector("table").addEventListener("click", function(e)
                 console.log("Что-то пошло не так");
                 break;
         }
-
-        updateTable(staffs);
     }
-
-    /* Удаление */
-
+}
+document.addEventListener("DOMContentLoaded", function() 
+{
+    // Очищаем поля и формы
+    document.getElementById('filter').value = '';
     
-});
 
-/* Фильтр */
-document.getElementById("filter").addEventListener("keydown", function(e) {
-    if (e.key == 'Enter') {
+    // Подгружаем таблицу----------------------------------------------------------- 
+    showStaffs(staffs);
+
+    // Показ формы по добавлению сотрудника----------------------------------------- 
+    btnAppend.addEventListener("click", () => {
+        modal.classList.add('show');
+    });
+
+    // Отслеживание кликов в форме по добавлению сотрудника------------------------- 
+    document.querySelector(".modal-dialog > .modal-content").addEventListener("click", function(e) 
+    {
+        // Скрытие формы------------------------------------------------------------ 
+        if (e.target.classList.contains("close-modal")) {
+            modal.classList.remove('show');
+        }
+
+        //Получение данных с формы----------------------------------------------------- 
+        if (e.target.classList.contains("save-modal")) {
+            const formData = new FormData(document.forms[0]);
+            const data = Object.fromEntries(formData.entries());
         
-        let word = document.getElementById("filter").value;
+            saveStaff(data, staffs);
+            document.forms[0].reset();
+
+            // Скрытие формы--------------------------------------------------------- 
+            modal.classList.remove('show');
+
+            showStaffs(staffs);
+        }
+    });
+
+    // Отслеживание кликов по таблице------------------------------------------------ 
+    document.querySelector("table").addEventListener("click", function(e) 
+    {
+        // Удаление записей---------------------------------------------------------- 
+        let tr = e.target.parentElement;
+        let id = Number(tr.childNodes[0].textContent);
+        deleteStaff(id, staffs);
+
+        // Сортировка по полю-------------------------------------------------------- 
+        tdSort = e.target.dataset.sort;
+        sortByField(tdSort, staffs);
+
+        showStaffs(staffs);
+    });
+
+    // Фильтр------------------------------------------------------------------------ 
+    let word = '';
+    document.getElementById("filter").addEventListener("keydown", function(e) {
+
+        let regex = /Key([A-Za-z]|[А-Яа-я])/;
+        if (e.key == 'Backspace') {
+            
+            if (word == '') {
+                return;
+            }
+            //удаление символов
+            word = word.substring(0, word.length - 1);
+
+        } else if (e.code.search(regex) != -1) {
+            //добавление символов
+            word += e.key;
+        }
+
+        //фильтрация
         let fillterList = [];
         staffs.filter((staff) => {
-            /* Фильтр по имени  */
+            // Фильтр по имени 
             let name = staff.name.toLowerCase();
             if (name.indexOf(word) != -1) {
                 fillterList.push(staff);
             }
         });
-        updateTable(fillterList);
-        console.log(word);
-    }
-
+        showStaffs(fillterList);
+        
+    });
 });
-
-
