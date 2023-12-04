@@ -100,32 +100,32 @@ function showStaffs(staffs)
             let td = document.createElement("td");
             switch (th.textContent) {
                 case "#":
-                    td.innerHTML = staff.id;
+                    td.textContent = staff.id;
                     tr.appendChild(td);
                     break;
                 case "Имя":
-                    td.innerHTML = staff.name;
+                    td.textContent = staff.name;
                     tr.appendChild(td);
                     break;
                 case "Навыки":
-                    td.innerHTML = staff.skills.join(', ');
+                    td.textContent = staff.skills.join(', ');
                     tr.appendChild(td);
                     break;
                 case "Дата":
                     let date = new Date(staff.employment_at);
-                    td.innerHTML = date.toLocaleDateString("ru-RU");
+                    td.textContent = date.toLocaleDateString("ru-RU");
                     tr.appendChild(td);
                     break;
                 case "Пол":
-                    td.innerHTML = staff.gender == "male" ? "мужской" : "женский";
+                    td.textContent = staff.gender == "male" ? "мужской" : "женский";
                     tr.appendChild(td);
                     break;
                 case "Возраст":
-                    td.innerHTML = staff.age;
+                    td.textContent = staff.age;
                     tr.appendChild(td);
                     break;
                 case "Зарплата":
-                    td.innerHTML =  new Intl.NumberFormat("ru-RU", {currency: 'RUB', style: 'currency'}).format(staff.salary);
+                    td.textContent =  new Intl.NumberFormat("ru-RU", {currency: 'RUB', style: 'currency'}).format(staff.salary);
                     tr.appendChild(td);
                     break;
             }
@@ -134,7 +134,7 @@ function showStaffs(staffs)
 
         // Добавление кнопки удаления----------------------------------------------- 
         let button = document.createElement("button");
-        button.innerHTML = "Удалить";
+        button.textContent = "Удалить";
         button.className = "delButton";
         tr.appendChild(button);
 
@@ -148,7 +148,8 @@ function showStaffs(staffs)
  */
 function saveStaff(staff, staffs) 
 {
-    staff.id = staffs.length;
+    let lastId = Math.max.apply(null, staffs.map((staff) => staff.id));
+    staff.id = lastId + 1;
     staff.skills = staff.skills.split(/,\s|,|\s/);
 
     staffs.push(staff);
@@ -261,11 +262,12 @@ document.addEventListener("DOMContentLoaded", function()
         let regex = /Key([A-Za-z]|[А-Яа-я])/;
         if (e.key == 'Backspace') {
             
-            if (word == '') {
-                return;
+            if (word != '') {
+                //удаление символов
+                word = word.substring(0, word.length - 1);
+                console.log(word);
             }
-            //удаление символов
-            word = word.substring(0, word.length - 1);
+            
 
         } else if (e.code.search(regex) != -1) {
             //добавление символов
