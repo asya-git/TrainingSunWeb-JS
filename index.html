@@ -39,16 +39,22 @@
                     <tr>
                         <th scope="col" data-sort="id">#</th>
                         <th scope="col" data-sort="name">Имя</th>
-                        <th scope="col">Навыки</th>
+                        <th scope="col" data-sort="username">Фамилия</th>
+                        <!-- <th scope="col">Навыки</th> -->
                         <th scope="col" data-sort="employment_at">Дата</th>
-                        <th scope="col" data-sort="gender">Пол</th>
+                        <th scope="col" data-sort="company">Компания</th>
+                        <th scope="col" data-sort="married">В браке</th>
                         <th scope="col" data-sort="age">Возраст</th>
                         <th scope="col" data-sort="salary">Зарплата</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
+                
             </table>
+            <!-- <button class="pagination">1cnp</button> -->
         </div>
+        <ul class="pagination">
+        </ul>
     </div>
     <div class="modal" tabindex="-1" id="modal">
         <div class="modal-dialog">
@@ -59,33 +65,51 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
+                        <p id="general-error" class="invalid-feedback">Заполните все поля!</p>
                         <form>
                             <div class="mb-3">
                                 <div class="row">
-                                    <label class="col-form-label">Пол:</label>
+                                    <label class="col-form-label">Статус:</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="male" value="male" checked>
-                                    <label class="form-check-label" for="male">
-                                        Мужской
+                                    <input class="form-check-input" type="radio" name="married" id="married" value="да" checked>
+                                    <label class="form-check-label" for="married">
+                                        В браке
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="female" value="female">
-                                    <label class="form-check-label" for="female">
-                                        Женский
+                                    <input class="form-check-input" type="radio" name="married" id="notMarried" value="нет">
+                                    <label class="form-check-label" for="notMarried">
+                                        Не в браке
                                     </label>
                                 </div>
+                                <p id="error-married" class="invalid-feedback">Некорректный статус</p>
                             </div>
                             <div class="mb-3">
                                 <div class="row">
                                     <div class="col">
                                         <label for="staff-name" class="col-form-label">Имя:</label>
                                         <input type="text" class="form-control" id="staff-name" name="name">
+                                        <p id="error-name" class="invalid-feedback">Некорректное имя</p>
                                     </div>
                                     <div class="col">
                                         <label for="staff-date" class="col-form-label">Дата:</label>
                                         <input type="date" class="form-control" id="staff-date" name="employment_at">
+                                        <p id="error-date" class="invalid-feedback">Некорректная дата</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="staff-surname" class="col-form-label">Фамилия:</label>
+                                        <input type="text" step="100" class="form-control" id="staff-surname" name="surname">
+                                        <p id="error-surname" class="invalid-feedback">Некорректная фамилия</p>
+                                    </div>
+                                    <div class="col">
+                                        <label for="staff-company" class="col-form-label">Компания:</label>
+                                        <input type="text" class="form-control" id="staff-company" name="company">
+                                        <p id="error-company" class="invalid-feedback">Некорректное наименование</p>
                                     </div>
                                 </div>
                             </div>
@@ -94,17 +118,19 @@
                                     <div class="col">
                                         <label for="staff-salary" class="col-form-label">Зарплата:</label>
                                         <input type="number" step="100" class="form-control" id="staff-salary" name="salary">
+                                        <p id="error-salary" class="invalid-feedback">Некорректная зарплата</p>
                                     </div>
                                     <div class="col">
                                         <label for="staff-age" class="col-form-label">Возраст:</label>
                                         <input type="number" class="form-control" id="staff-age" name="age">
+                                        <p id="error-age" class="invalid-feedback">Некорректный возраст</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="staff-skills" class="col-form-label">Навыки:</label>
                                 <textarea class="form-control" id="staff-skills" name="skills" rows="6"></textarea>
-                            </div>
+                            </div> -->
                         </form>
                     </div>
                 </div>

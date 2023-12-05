@@ -1,6 +1,3 @@
-.show {
-    display: block;
-}
 
 .delButton {
     height: auto;
@@ -12,4 +9,25 @@
     background-color: brown;
     color: white;
     border-radius: 5px;
+}
+.pagination {
+    display: none;
+}
+.pagination-active {
+    display: flex;
+    flex-direction: row;
+
+    list-style: none;
+}
+.error {
+    display: none;
+    color: brown;
+}
+.button-active {
+    border: 0;
+    font-weight: 400;
+}
+
+.show {
+    display: block;
 }
