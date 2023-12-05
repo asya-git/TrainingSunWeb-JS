@@ -1,0 +1,15 @@
+.show {
+    display: block;
+}
+
+.delButton {
+    height: auto;
+    color: black;
+    border: 0;
+}
+
+.delButton:hover {
+    background-color: brown;
+    color: white;
+    border-radius: 5px;
+}
