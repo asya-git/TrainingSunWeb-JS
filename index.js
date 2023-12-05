@@ -88,7 +88,7 @@ const modal = document.getElementById("modal");
 const ulPagination = document.querySelector(".pagination");
 const modalBody = document.querySelector(".modal-body");
 
-let staffs = '';
+let staffs = null;
 
 /**
  * обработка входящих данных
@@ -344,28 +344,20 @@ function checkForm(staff)
 
 
     //Очистка стилей---------------------------------------------------------------
+    clearClass(generalError, ['show']);
+    clearClass(errorMarried, ['show']);
 
-    clearClass(generalError, ['invalid-feedback', 'show']);
+    clearClass(inputName, ['is-invalid']);
 
-    clearClass(errorMarried, ['invalid-feedback', 'show']);
+    clearClass(inputDate, ['is-invalid']);
 
-    clearClass(errorName, ['invalid-feedback', 'show']);
-    clearClass(inputName, ['invalid']);
+    clearClass(inputSurname, ['is-invalid']);
 
-    clearClass(errorDate, ['invalid-feedback', 'show']);
-    clearClass(inputDate, ['invalid']);
+    clearClass(inputCompany, ['is-invalid']);
 
-    clearClass(errorSurname, ['invalid-feedback', 'show']);
-    clearClass(inputSurname, ['invalid']);
+    clearClass(inputSalary, ['is-invalid']);
 
-    clearClass(errorCompany, ['invalid-feedback', 'show']);
-    clearClass(inputCompany, ['invalid']);
-
-    clearClass(errorSalary, ['invalid-feedback', 'show']);
-    clearClass(inputSalary, ['invalid']);
-
-    clearClass(errorAge, ['invalid-feedback', 'show']);
-    clearClass(inputAge, ['invalid']);
+    clearClass(inputAge, ['is-invalid']);
 
     //Регулярки--------------------------------------------------------------------
     const onlyLetters = /[^A-zА-я]/;
@@ -377,63 +369,44 @@ function checkForm(staff)
     if (staff.name == '' || staff.surname == ''|| staff.salary == '') {
 
         generalError.classList.add('show');
-        generalError.classList.add('is-invalid');
+        generalError.classList.add('invalid-feedback');
 
         return false;
     }
 
-    generalError.classList.remove('show')
-
     if (staff.name.search(onlyLetters) != -1) {
-        errorName.classList.add('is-invalid');
-        errorName.classList.add('show');
 
-        inputName.classList.add('invalid');
+        inputName.classList.add('is-invalid');
 
         return false;
     } else if (staff.employment_at.search(regDate) == -1 && (new Date(staff.employment_at)) > (new Date())) {
 
-        errorDate.classList.add('is-invalid');
-        errorDate.classList.add('show');
-
-        inputDate.classList.add('invalid');
+        inputDate.classList.add('is-invalid');
 
         return false;
     }  else if (staff.surname.search(onlyLetters) != -1) {
 
-        errorSurname.classList.add('is-invalid');
-        errorSurname.classList.add('show');
-
-        inputSurname.classList.add('invalid');
+        inputSurname.classList.add('is-invalid');
 
         return false;
     } else if (staff.company.search(onlyLetters) != -1) {
 
-        errorCompany.classList.add('is-invalid');
-        errorCompany.classList.add('show');
-
-        inputCompany.classList.add('invalid');
+        inputCompany.classList.add('is-invalid');
 
         return false;
     } else if (staff.salary.search(onlyNumbers) != -1) {
 
-        errorSalary.classList.add('is-invalid');
-        errorSalary.classList.add('show');
-
-        inputSalary.classList.add('invalid');
+        inputSalary.classList.add('is-invalid');
 
         return false;
     } else if (staff.age.search(onlyNumbers) != -1 && +staff.age > 130) {
 
-        errorAge.classList.add('is-invalid');
-        errorAge.classList.add('show');
-
-        inputAge.classList.add('invalid');
+        inputAge.classList.add('is-invalid');
 
         return false;
     } else if (staff.married.search(regMarried) == -1) {
 
-        errorMarried.classList.add('is-invalid');
+        errorMarried.classList.add('error');
         errorMarried.classList.add('show');
 
         return false;
