@@ -101,9 +101,9 @@ function render(data)
         let person = {
             id: item.id,
             name: item.name,
-            username: item.username,
+            username: item.username ?? item.surname,
             employment_at: (new Date(item.employment_at ?? new Date())).toLocaleDateString("ru-RU"),
-            ['company name']: item.company.name,
+            ['company name']: item.company.name ?? item.company,
             married: item.married ?? "Да",
             age: item.age ?? 20,
             salary: new Intl.NumberFormat("ru-RU", {currency: 'RUB', style: 'currency'}).format(item.salary ?? 8000)
@@ -243,9 +243,11 @@ function saveStaff(staff, staffs)
     let lastId = Math.max.apply(null, staffs.map((staff) => staff.id));
     staff.id = lastId + 1;
 
-    staff.skills = staff.skills.split(/,\s|,|\s/);
+    staffs.push(render([staff])[0]);
+    /* showStaffs(staffs); */
+    //staff.skills = staff.skills.split(/,\s|,|\s/);
 
-    staffs.push(staff);
+    
 }
 
 /**
@@ -294,7 +296,7 @@ function sortByField(field, staffs)
                 staffs.sort((a, b) => a.married > b.married ? 1 : -1);
                 break;
             case 'employment_at':
-                staffs.sort((a, b) => a.employment_at > b.employment_at ? 1 : -1);
+                staffs.sort((a, b) =>  (new Date(a.employment_at)) > (new Date(b.employment_at)) ? 1 : -1);
                 break;
             default:
                 console.log("Что-то пошло не так");
@@ -320,26 +322,12 @@ function clearClass(elem, deleteClasses)
 function checkForm(staff)
 {
     const generalError = document.getElementById('general-error');
-
-    const errorName = document.getElementById('error-name');
     const inputName = document.getElementById('staff-name');
-
-    const errorDate = document.getElementById('error-date');
     const inputDate = document.getElementById('staff-date');
-
-    const errorSurname = document.getElementById('error-surname');
     const inputSurname = document.getElementById('staff-surname');
-
-    const errorCompany = document.getElementById('error-company');
     const inputCompany = document.getElementById('staff-company');
-
-    const errorSalary = document.getElementById('error-salary');
     const inputSalary = document.getElementById('staff-salary');
-
-    const errorAge = document.getElementById('error-age');
     const inputAge = document.getElementById('staff-age');
-
-
     const errorMarried = document.getElementById('error-married');
 
 
@@ -348,15 +336,10 @@ function checkForm(staff)
     clearClass(errorMarried, ['show']);
 
     clearClass(inputName, ['is-invalid']);
-
     clearClass(inputDate, ['is-invalid']);
-
     clearClass(inputSurname, ['is-invalid']);
-
     clearClass(inputCompany, ['is-invalid']);
-
     clearClass(inputSalary, ['is-invalid']);
-
     clearClass(inputAge, ['is-invalid']);
 
     //Регулярки--------------------------------------------------------------------
@@ -366,50 +349,52 @@ function checkForm(staff)
     const regDate = /\d{2}\.\d{2}\.\d{4}/; 
 
     //Проверка на заполненость полей-----------------------------------------------
-    if (staff.name == '' || staff.surname == ''|| staff.salary == '') {
+    if (staff.name == '' || staff.surname == ''|| staff.salary == ''|| staff.age == ''|| staff.company == ''|| staff.employment_at == '') {
 
         generalError.classList.add('show');
-        generalError.classList.add('invalid-feedback');
-
         return false;
     }
 
     if (staff.name.search(onlyLetters) != -1) {
 
         inputName.classList.add('is-invalid');
-
         return false;
+
     } else if (staff.employment_at.search(regDate) == -1 && (new Date(staff.employment_at)) > (new Date())) {
 
         inputDate.classList.add('is-invalid');
-
         return false;
+
     }  else if (staff.surname.search(onlyLetters) != -1) {
 
         inputSurname.classList.add('is-invalid');
-
         return false;
+
     } else if (staff.company.search(onlyLetters) != -1) {
 
         inputCompany.classList.add('is-invalid');
-
         return false;
+
     } else if (staff.salary.search(onlyNumbers) != -1) {
 
         inputSalary.classList.add('is-invalid');
-
         return false;
-    } else if (staff.age.search(onlyNumbers) != -1 && +staff.age > 130) {
+
+    } else if (staff.age.search(onlyNumbers) == -1 && +staff.age > 130) {
 
         inputAge.classList.add('is-invalid');
-
         return false;
+
     } else if (staff.married.search(regMarried) == -1) {
 
-        errorMarried.classList.add('error');
         errorMarried.classList.add('show');
-
         return false;
+    } else {
+        generalError.classList.remove('invalid-feedback');
+        generalError.classList.add('valid-feedback');
+        generalError.classList.add('show');
+
+        return true;
     }
 }
 
@@ -463,14 +448,16 @@ document.addEventListener("DOMContentLoaded", function()
             const data = Object.fromEntries(formData.entries());
         
             if (checkForm(data)) {
+
                 saveStaff(data, staffs);
                 document.forms[0].reset();
-
-                // Скрытие формы--------------------------------------------------------- 
-                modal.classList.remove('show');
+                
+                modal.classList.remove('show'); // Скрытие формы
+                document.getElementById('general-error').classList.remove('show');//Чистка уведомлений
 
                 showStaffs(staffs,itemsPerPage, currentPage);
             }
+            
         }
     });
 
