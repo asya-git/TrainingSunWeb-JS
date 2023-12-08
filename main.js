@@ -15,6 +15,7 @@ var app = new Vue({
         users: [],
         isCheckUser: false,
         newUser: {
+            married: 'Да',
             name: '',
             employment_at: '',
             surname: '',
@@ -23,9 +24,8 @@ var app = new Vue({
             age: '',
         },
         statusMessage: true,
-        sortBy: null,
         message: '',
-        /* dataSort: [], */
+        dataSort: '',
         searchInput: '',
         fillterList: [],
         url: 'https://jsonplaceholder.typicode.com/users',
@@ -36,7 +36,6 @@ var app = new Vue({
     },
     created: function(){
         this.getStaffs();
-        //this.render();
     },
     computed: {
         pagination: function() {
@@ -59,6 +58,7 @@ var app = new Vue({
 
             let users = [...this.dataUsers];
 
+            //Фильтрация
             if (this.searchInput != '') {
                 users = users.filter((user) => {
                     // Фильтр по имени -----------------------------------------------------
@@ -78,9 +78,42 @@ var app = new Vue({
                 }
             } 
 
+            //Сортировка
+            if (this.dataSort != '') {
+                switch (this.dataSort) {
+                    case 'id':
+                        users.sort((a, b) => a.id > b.id ? 1 : -1);
+                        break;
+                    case 'name':
+                        users.sort((a, b) => a.name > b.name ? 1 : -1);
+                        break;
+                    case 'username':
+                        users.sort((a, b) => a.username > b.username ? 1 : -1);
+                        break;
+                    case 'age':
+                        users.sort((a, b) => a.age > b.age ? 1 : -1);
+                        break;
+                    case 'company':
+                        users.sort((a, b) => a.company > b.company ? 1 : -1);
+                        break;
+                    case 'salary':
+                        users.sort((a, b) => a.salary > b.salary ? 1 : -1);
+                        break;
+                    case 'married':
+                        users.sort((a, b) => a.married > b.married ? 1 : -1);
+                        break;
+                    case 'employment_at':
+                        users.sort((a, b) =>  (new Date(a.employment_at)) > (new Date(b.employment_at)) ? 1 : -1);
+                        break;
+                    default:
+                        console.log("Что-то пошло не так");
+                        break;
+                }
+            }
+
             users = users.slice((this.currentPage * this.itemsPerPage - this.itemsPerPage), (this.currentPage * this.itemsPerPage))
             .map(user => {
-                console.log(user);
+                //console.log(user);
                 return {
                 id: user.id,
                 name: user.name,
@@ -94,35 +127,13 @@ var app = new Vue({
 
             return users;
         },
-        clearForm: function() {
-            if (this.showModal == false) {
-                this.newUser = {
-                    name: '',
-                    employment_at: '',
-                    surname: '',
-                    company: '',
-                    salary: '',
-                    age: '',
-                }
-                this.errorsField = {
-                    name: true,
-                    employment_at: true,
-                    surname: true,
-                    company: true,
-                    salary: true,
-                    age: true,
-                }
-                this.statusMessage = true;
-                this.message = '';
-
-            }
-        },
     },
     methods: {
         clearForm: function() {
             this.isCheckUser = false;
 
             this.newUser = {
+                married: 'Да',
                 name: '',
                 employment_at: '',
                 surname: '',
@@ -139,7 +150,7 @@ var app = new Vue({
                 age: true,
             };
             this.statusMessage = true;
-            this.message =  '';
+            this.message = '';
         },
         closeModel: function() {
 
@@ -155,12 +166,6 @@ var app = new Vue({
                 });
 
                 if (resp.ok) {
-                    console.log(
-                        {
-                            status: 'true',
-                            message: `Пользователь с id: ${userId} - Успешно удалён!`,
-                        }
-                    );
                     this.statusMessage = true,
                     this.message =  `Пользователь с id: ${userId} - Успешно удалён!`;
                 }
@@ -171,13 +176,7 @@ var app = new Vue({
                 }, 2000);
                 
             } catch (err) {
-                console.log('error');
-                console.log(
-                    {
-                        status: 'false',
-                        message: `Пользователя с id: ${userId} - Не удалось удалить!`,
-                    }
-                );
+                
                 this.statusMessage = false,
                 this.message =  `Пользователя с id: ${userId} - Не удалось удалить!`;
             }
@@ -233,7 +232,7 @@ var app = new Vue({
                 && this.newUser.age != '' && Number(this.newUser.age) < 130 ? false : true;
 
             //Готовность к сохранению
-            if (!this.errorsField.name && !this.errorsField.surname && !this.errorsField.surncompanyame && !this.errorsField.salary && !this.errorsField.salary && !this.errorsField.employment_at  && !this.errorsField.age) {
+            if (!this.errorsField.name && !this.errorsField.surname && !this.errorsField.company && !this.errorsField.salary && !this.errorsField.salary && !this.errorsField.employment_at  && !this.errorsField.age) {
                 
                 this.isCheckUser = true;
             } else {
@@ -244,58 +243,14 @@ var app = new Vue({
         getStaffs: async function() {
             try {
                 const resp = await fetch(this.url);
-                const data = await resp.json();
-        
-                this.dataUsers = data;
+                this.dataUsers = await resp.json();
+    
             } catch (err) {
                 console.log('error');
             }
         },
         sortUsers: function(event) {
-            const field = event.target.dataset.sort;
-
-            this.userSotr = this.dataUsers;
-
-            //this.dataUsers = [];
-
-            //console.log(field);
-
-            if (field) {
-                //console.log('tyt');
-                switch (field) {
-                    case 'id':
-                        //console.log('tyt');
-                        this.userSotr.sort((a, b) => a.id > b.id ? 1 : -1);
-                        break;
-                    case 'name':
-                        this.userSotr.sort((a, b) => a.name > b.name ? 1 : -1);
-                        break;
-                    case 'username':
-                        this.userSotr.sort((a, b) => a.username > b.username ? 1 : -1);
-                        break;
-                    case 'age':
-                        this.userSotr.sort((a, b) => a.age > b.age ? 1 : -1);
-                        break;
-                    case 'company':
-                        this.userSotr.sort((a, b) => a.company > b.company ? 1 : -1);
-                        break;
-                    case 'salary':
-                        this.userSotr.sort((a, b) => a.salary > b.salary ? 1 : -1);
-                        break;
-                    case 'married':
-                        this.userSotr.sort((a, b) => a.married > b.married ? 1 : -1);
-                        break;
-                    case 'employment_at':
-                        this.userSotr.sort((a, b) =>  (new Date(a.employment_at)) > (new Date(b.employment_at)) ? 1 : -1);
-                        break;
-                    default:
-                        console.log("Что-то пошло не так");
-                        break;
-                }
-
-                console.log(this.dataUsers);
-            }
-            //console.log(this.data);
+            this.dataSort = event.target.dataset.sort;
         },
     },
 
