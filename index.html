@@ -8,8 +8,182 @@
     <title>Lesson 1</title>
 </head>
 <body>
+
 <div class="container">
-    <menu class="nav nav-pills mb-4">
+    <div id="app">
+        <menu class="nav nav-pills mb-4">
+            <li class="nav-item">
+                <a href="index.html" class="nav-link active">Главная</a>
+            </li>
+            <li class="nav-item">
+                <a href="users/users.html" class="nav-link">Пользователи</a>
+            </li>
+            <li class="nav-item">
+                <a href="form/form.html" class="nav-link">Форма</a>
+            </li>
+            <li class="nav-item">
+                <a href="todo/todo.html" class="nav-link">Список дел</a>
+            </li>
+        </menu>
+
+        <div class="row">
+            <div class="col-6">
+                <input id="filter" v-model="searchInput" class="form-control" type="text" placeholder="фильтр" aria-label="default input example">
+            </div>
+            <div class="col"></div>
+            <div class="col-1">
+                <button class="btn btn-primary open-modal" v-on:click="showModal = true" >Добавить</button>
+            </div>
+        </div>
+
+        <!-- <div class="alert" v-bind:class="{'alert-danger': !statusMessage }" role="alert" v-if="statusMessage == false">
+            {{message}}
+        </div> -->
+        <div class="alert" v-bind:class="[ statusMessage ? 'alert-success': 'alert-danger']" role="alert" v-if="message != ''">
+            {{message}}
+        </div>
+
+        <div class="row mt-5">
+            <div class="col">
+                <table class="table table-sm table-striped table-hover">
+                    <thead>
+                        <tr v-on:click="sortUsers">
+                            <th scope="col" data-sort="id">#</th>
+                            <th scope="col" data-sort="name">Имя</th>
+                            <th scope="col" data-sort="username">Фамилия</th>
+                            <th scope="col" data-sort="employment_at">Дата</th>
+                            <th scope="col" data-sort="company">Компания</th>
+                            <th scope="col" data-sort="married">В браке</th>
+                            <th scope="col" data-sort="age">Возраст</th>
+                            <th scope="col" data-sort="salary">Зарплата</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" >
+
+                        <template v-if="fillterList.length">
+                            <template v-for="user in showUsers">
+                                <tr>
+                                    <td v-for="td in user">{{td}}</td>
+                                    <td><button class="delButton" v-on:click="deleteUser">Удалить</button></td>
+                                </tr>
+                            </template>
+                        </template>
+                        <template v-else> 
+                            <template v-for="user in showUsers">
+                                <tr>
+                                    <td v-for="td in user">{{td}}</td>
+                                    <td><button class="delButton" v-on:click="deleteUser">Удалить</button></td>
+                                </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            <ul class="pagination-active pagination-sm">
+                
+                <div  v-for="page in pagination">
+                    <li v-if="page.isActive" class="page-item active">
+                        <button class="page-link" v-on:click="changePage" >{{page.pageNumber}}</button>
+                    </li>
+                    <li v-else class="page-item ">
+                        <button class="page-link" v-on:click="changePage" >{{page.pageNumber}}</button>
+                    </li>
+                </div>
+                
+                   
+            </ul>
+        </div>
+
+        <div class="modal" tabindex="-1" v-if="showModal" id="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Новый сотрудник</h5>
+                        <button type="button" class="btn-close close-modal" v-on:click="closeModel" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <p id="general-error" v-if="generalError" class="invalid-feedback show">Заполните все поля!</p>
+                            <div class="alert" v-bind:class="[ statusMessage ? 'alert-success': 'alert-danger']" role="alert" v-if="message != ''">
+                                {{message}}
+                            </div>
+                            <form>
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <label class="col-form-label">Статус:</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="married" id="married" value="Да" checked>
+                                        <label class="form-check-label" for="married">
+                                            В браке
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="married" id="notMarried" value="Нет">
+                                        <label class="form-check-label" for="notMarried">
+                                            Не в браке
+                                        </label>
+                                    </div>
+                                    <p id="error-married" class="invalid-feedback">Некорректный статус</p>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="staff-name" class="col-form-label">Имя:</label>
+                                            <input v-bind:class="{ 'is-invalid': errorsField.name }" v-on:blur.stop="checkUser" v-model="newUser.name" type="text" class="form-control" id="staff-name" name="name">
+                                            <p id="error-name" class="invalid-feedback">Некорректное имя</p>
+                                        </div>
+                                        <div class="col">
+                                            <label for="staff-date" class="col-form-label">Дата:</label>
+                                            <input v-bind:class="{ 'is-invalid': errorsField.employment_at }" v-on:blur.stop="checkUser" v-model="newUser.employment_at" type="date" class="form-control" id="staff-date" name="employment_at">
+                                            <p id="error-date" class="invalid-feedback">Некорректная дата</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="staff-surname" class="col-form-label">Фамилия:</label>
+                                            <input v-bind:class="{ 'is-invalid': errorsField.surname }" v-on:blur.stop="checkUser" v-model="newUser.surname" type="text" step="100" class="form-control" id="staff-surname" name="surname">
+                                            <p id="error-surname" class="invalid-feedback">Некорректная фамилия</p>
+                                        </div>
+                                        <div class="col">
+                                            <label for="staff-company" class="col-form-label">Компания:</label>
+                                            <input v-bind:class="{ 'is-invalid': errorsField.company }" v-on:blur.stop="checkUser" v-model="newUser.company"  type="text" class="form-control" id="staff-company" name="company">
+                                            <p id="error-company" class="invalid-feedback">Некорректное наименование</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="staff-salary" class="col-form-label">Зарплата:</label>
+                                            <input v-bind:class="{ 'is-invalid': errorsField.salary }" v-on:blur.stop="checkUser" v-model="newUser.salary"  type="number" step="100" class="form-control" id="staff-salary" name="salary">
+                                            <p id="error-salary" class="invalid-feedback">Некорректная зарплата</p>
+                                        </div>
+                                        <div class="col">
+                                            <label for="staff-age" class="col-form-label">Возраст:</label>
+                                            <input v-bind:class="{ 'is-invalid': errorsField.age }" v-on:blur.stop="checkUser" v-model="newUser.age" type="number" class="form-control" id="staff-age" name="age">
+                                            <p id="error-age" class="invalid-feedback">Некорректный возраст</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary close-modal" v-on:click="closeModel" data-bs-dismiss="modal">Отменить</button>
+                        <button  type="button" class="btn btn-primary save-modal" v-on:click="saveUser" >Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- <menu class="nav nav-pills mb-4">
         <li class="nav-item">
             <a href="index.html" class="nav-link active">Главная</a>
         </li>
@@ -22,8 +196,8 @@
         <li class="nav-item">
             <a href="todo/todo.html" class="nav-link">Список дел</a>
         </li>
-    </menu>
-    <div class="row">
+    </menu> -->
+    <!-- <div class="row">
         <div class="col-6">
             <input id="filter" class="form-control" type="text" placeholder="фильтр" aria-label="default input example">
         </div>
@@ -31,8 +205,8 @@
         <div class="col-1">
             <button class="btn btn-primary open-modal">Добавить</button>
         </div>
-    </div>
-    <div class="row mt-5">
+    </div> -->
+    <!-- <div class="row mt-5">
         <div class="col">
             <table class="table table-sm table-striped table-hover">
                 <thead>
@@ -53,8 +227,8 @@
         </div>
         <ul class="pagination">
         </ul>
-    </div>
-    <div class="modal" tabindex="-1" id="modal">
+    </div> -->
+    <!-- <div class="modal" tabindex="-1" id="modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -125,10 +299,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="mb-3">
-                                <label for="staff-skills" class="col-form-label">Навыки:</label>
-                                <textarea class="form-control" id="staff-skills" name="skills" rows="6"></textarea>
-                            </div> -->
                         </form>
                     </div>
                 </div>
@@ -138,8 +308,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
-<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="main.js"></script>
 </body>
 </html>
