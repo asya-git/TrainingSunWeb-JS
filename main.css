@@ -1,4 +1,6 @@
-
+.modal {
+    display: block;
+}
 .delButton {
     height: auto;
     color: black;
@@ -10,9 +12,9 @@
     color: white;
     border-radius: 5px;
 }
-.pagination {
+/* .pagination {
     display: none;
-}
+} */
 .pagination-active {
     display: flex;
     flex-direction: row;
